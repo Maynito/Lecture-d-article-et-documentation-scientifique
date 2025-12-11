@@ -46,3 +46,11 @@ lecture_article/
 ## Date
 
 Décembre 2025
+
+## Commandes pour compiler le document LaTeX
+
+Pour compiler le document LaTeX, utilisez les commandes suivantes dans le terminal :
+
+```bash
+pdflatex rendu_article.tex
+```
