@@ -1,0 +1,47 @@
+# Lecture d'Article Scientifique - Attaques DNS
+
+## Description
+
+Ce projet est un rendu académique portant sur l'analyse d'articles scientifiques traitant des vulnérabilités et attaques sur le système DNS (Domain Name System).
+
+## Thématiques abordées
+
+### Attaque Kaminsky (2008)
+- Exploitation de la faiblesse des identifiants de transaction DNS
+- Empoisonnement du cache DNS à grande échelle
+- Impact majeur sur la sécurité d'Internet
+
+### SAD DNS (Side-channel AttackeD DNS, 2020)
+- Attaque par canal auxiliaire sur le DNS
+- Contournement des protections post-Kaminsky
+- Exploitation des limites ICMP pour deviner les ports UDP
+
+### TuDoor (2023)
+- Nouvelle génération d'attaques DNS
+- Exploitation de vulnérabilités dans les implémentations DNS modernes
+- Techniques avancées d'empoisonnement de cache
+
+## Structure du projet
+
+```
+lecture_article/
+├── README.md
+├── /modele
+│   ├── rendu_article.pdf
+│   └── rendu_article.tex
+```
+
+## Auteur
+
+- **Nom** et **Prénom** : Autret Lucas et Terrien Maxime
+- **Contexte** : Rendu académique
+
+## Références
+
+- Kaminsky, D. (2008). "DNS Vulnerability"
+- Qian, K. et al. (2020). "SAD DNS: Exploiting Weakened Trust"
+- TuDoor (2023). Publication sur les attaques DNS modernes
+
+## Date
+
+Décembre 2025
