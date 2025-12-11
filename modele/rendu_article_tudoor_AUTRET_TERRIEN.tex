@@ -182,22 +182,37 @@ DNS Security, Logic Vulnerabilities, TuDoor Attack, Kaminsky Attack, SAD DNS, DN
 %% ==========================================
 \section{Introduction}\label{sec:introduction}
 
-% Contexte
-\lipsum[1]
+% Contexte : Le DNS, infrastructure critique mais vieille
+The Domaine Name System (DNS) is one of the most critical infrastructure of the modern Internet
+because of it's fonction. Designed in the 1980s, this protocol translates human-readable
+domain names into IP addresses, making web navgiation easier for users. However, its age and
+widespread adoption have made it a prime target for attackers seeking to compromise Internet
+communications.
 
-% Problématique
-\lipsum[2]
+% Problématique : Complexité croissante = nouvelles failles
+Over the past two decades, DNS has been the subject of numerous cache poisoning attacks.
+The Kaminsky attack in 2008 revealed fundamental weaknesses in the protocol, leading to
+multiple patches including source port randomization. Despite these countermeasures, SAD
+DNS in 2020 demonstrated that side-channel vulnerabilities in operating systems could bypass
+existing protections. More recently, the TuDoor attack (2024) has unveiled a new attack surface:
+logic vulnerabilities in DNS response pre-processing, where inconsistent handling of malformed
+packets across implementations creates exploitable conditions.
 
 % Annonce du plan
-\lipsum[3]
-
+This paper analyzes the evolution of DNS attacks and examines in detail the TuDoor attack
+methodology notably on cache poisoning. We will first present the DNS architecture in 
+section~\ref{sec:context} to get a better understanding of how it works. Then we will get an 
+overview of the history of DNS attacks with Kaminsky and SAD DNS. 
+After that, we will describe the TuDoor attack in section~\ref{sec:contribution}, its technical
+mechanisms, and comparative analysis with prior work. Finally, we will discuss the impact on
+DNS security and propose mitigation strategies in section~\ref{sec:discussion}. 
 
 %% ==========================================
 %% 2. ÉTAT DE L'ART & HISTORIQUE (~1 page = 1/4 du rapport)
 %% ==========================================
 \section{État de l'art et Historique}\label{sec:context}
 
-\subsection{Fonctionnement du DNS}
+\subsection{How DNS Works}
 
 \lipsum[4]
 
@@ -205,7 +220,7 @@ DNS Security, Logic Vulnerabilities, TuDoor Attack, Kaminsky Attack, SAD DNS, DN
 
 \lipsum[6]
 
-\subsection{Attaque Kaminsky (2008)}
+\subsection{Kaminsky attack (2008)}
 
 \lipsum[7]
 
