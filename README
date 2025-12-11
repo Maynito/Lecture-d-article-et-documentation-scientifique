@@ -29,6 +29,7 @@ lecture_article/
 ├── /modele
 │   ├── rendu_article.pdf
 │   └── rendu_article.tex
+└── TuDoor_Attack_Systematically_Exploring_and_Exploiting_Logic_Vulnerabilities_in_DNS_Response_Pre-processing_with_Malformed_Packets/
 ```
 
 ## Auteur
@@ -40,8 +41,16 @@ lecture_article/
 
 - Kaminsky, D. (2008). "DNS Vulnerability"
 - Qian, K. et al. (2020). "SAD DNS: Exploiting Weakened Trust"
-- TuDoor (2023). Publication sur les attaques DNS modernes
+- Li, X., Xu, W., Liu, B., Zhang, M., Li, Z., Zhang, J., Chang, D., Zheng, X., Wang, C., Chen, J., Duan, H., & Li, Q. (2024). "TuDoor Attack: Systematically Exploring and Exploiting Logic Vulnerabilities in DNS Response Pre-processing with Malformed Packets". *2024 IEEE Symposium on Security and Privacy (SP)*, pp. 4459-4477. DOI: 10.1109/SP54263.2024.00172
 
 ## Date
 
 Décembre 2025
+
+## Commandes pour compiler le document LaTeX
+
+Pour compiler le document LaTeX, utilisez les commandes suivantes dans le terminal :
+
+```bash
+pdflatex rendu_article.tex
+```

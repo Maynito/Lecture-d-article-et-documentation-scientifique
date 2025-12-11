@@ -1,4 +1,3 @@
-
 %% bare_jrnl_compsoc.tex
 %% V1.4b
 %% 2015/08/26
@@ -56,8 +55,11 @@
 % manually specify the path to it like:
 % \documentclass[10pt,journal,compsoc]{../sty/IEEEtran}
 
+% Police par défaut pour éviter les erreurs
+\usepackage{mathptmx}
 
-
+% Package pour le texte fictif latin
+\usepackage{lipsum}
 
 
 % Some very useful LaTeX packages include:
@@ -156,16 +158,14 @@
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{Title}
+\title{Analyzing Logic Vulnerabilities in DNS Response Pre-processing: \\From Kaminsky to TuDoor}
 
-\author{Michael~Shell,
-        John~Doe,
-        and~Jane~Doe}% <-this % stops a space}
+\author{Autret~Lucas
+        and~Terrien~Maxime}% <-this % stops a space}
 
 \IEEEtitleabstractindextext{%
-% Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Keyword 1, Keyword 2, \ldots
+DNS Security, Logic Vulnerabilities, TuDoor Attack, Kaminsky Attack, SAD DNS, DNS Response Pre-processing
 \end{IEEEkeywords}}
 
 
@@ -177,37 +177,120 @@ Keyword 1, Keyword 2, \ldots
 \IEEEpeerreviewmaketitle
 
 
-
+%% ==========================================
+%% 1. INTRODUCTION
+%% ==========================================
 \section{Introduction}\label{sec:introduction}
 
-\section{Context}\label{sec:context}
+% Contexte
+\lipsum[1]
 
-\section{Contribution}\label{sec:contribution}
+% Problématique
+\lipsum[2]
 
-\subsection{Subsection Heading Here}
-Subsection text here.
-
-\section{Discussion}\label{sec:discussion}
-\subsection{Text}
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
-
-\section{Related Work}\label{sec:related}
-\section{Conclusion}\label{sec:conclusion}
+% Annonce du plan
+\lipsum[3]
 
 
+%% ==========================================
+%% 2. ÉTAT DE L'ART & HISTORIQUE (~1 page = 1/4 du rapport)
+%% ==========================================
+\section{État de l'art et Historique}\label{sec:context}
 
+\subsection{Fonctionnement du DNS}
 
-\appendices
-\section{Proof of the First Zonklar Equation}
-Appendix one text goes here.
+\lipsum[4]
+
+\lipsum[5]
+
+\lipsum[6]
+
+\subsection{Attaque Kaminsky (2008)}
+
+\lipsum[7]
+
+\lipsum[8]
+
+\lipsum[9]
+
+\lipsum[10]
+
+\subsection{SAD DNS (2020)}
+
+\lipsum[11]
+
+\lipsum[12]
+
+\lipsum[13]
+
+\lipsum[14]
+
+%% ==========================================
+%% 3. TUDOOR : L'ATTAQUE LOGIQUE
+%% ==========================================
+\section{TuDoor Attack}\label{sec:contribution}
+
+\subsection{TuDoor Attack Overview}
+
+\lipsum[15]
+
+\lipsum[16]
+
+\lipsum[17]
+
+\subsection{Technical Details}
+
+\lipsum[18]
+
+\lipsum[19]
+
+\lipsum[20]
+
+\subsection{Mecanism of the Vulnerability}
+
+\lipsum[21]
+
+\lipsum[22]
+
+\lipsum[23]
+
+\subsection{Comparative Analysis with Previous Attacks}
+
+\lipsum[24]
+
+\lipsum[25]
+
+%% ==========================================
+%% 4. DISCUSSION & CONCLUSION
+%% ==========================================
+\section{Discussion and Conclusion}\label{sec:discussion}
+
+\subsection{Impact on DNS Security}
+
+\lipsum[26]
+
+\subsection{Causes and Mitigations}
+
+\lipsum[27]
+
+\subsection{Conclusion}
+
+\lipsum[28]
+
 
 \begin{thebibliography}{1}
+\bibitem{tudoor}
+X.~Li \emph{et al.}, ``TuDoor Attack: Systematically Exploring and Exploiting Logic Vulnerabilities in DNS Response Pre-processing with Malformed Packets,'' \emph{2024 IEEE Symposium on Security and Privacy (SP)}, pp. 4459-4477, 2024.
+
+\bibitem{kaminsky}
+D.~Kaminsky, ``DNS Vulnerability,'' Black Hat USA, 2008.
+
+\bibitem{saddns}
+K.~Qian \emph{et al.}, ``SAD DNS: Exploiting Weakened Trust in DNS,'' \emph{ACM CCS}, 2020.
+
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 \end{thebibliography}
 
 \end{document}
-
-
