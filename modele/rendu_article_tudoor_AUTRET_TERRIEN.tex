@@ -251,13 +251,44 @@ requested IP address, which is relayed back through the chain to the original cl
 
 \subsection{SAD DNS (2020)}
 
-\lipsum[11]
+The \textbf{SAD DNS (Side-channel AttackeD DNS) attack}, disclosed in 2020 by researchers from Tsinghua University
+and the University of California, Riverside, marked a critical regression in DNS security. It demonstrated a method
+to effectively resurrect the classic DNS cache poisoning attack by bypassing the primary mitigation implemented
+after the 2008 Kaminsky attack: \textbf{Source Port Randomization (SPR)}.
 
-\lipsum[12]
+The success of SAD DNS relies on exploiting a subtle, yet pervasive, vulnerability in the networking stacks of modern
+operating systems: the predictable rate limit applied to outgoing \textbf{Internet Control Message Protocol (ICMP)}
+error messages, specifically the "Port Unreachable" message. This ICMP rate limit serves as a timing side-channel that
+allows an off-path attacker to significantly reduce the entropy of a DNS query.
 
-\lipsum[13]
+Prior to this attack, SPR had increased query entropy from 16 bits (Transaction ID, $TxID$) to 32 bits
+($TxID$ plus the random 16-bit source port). The attack uses the following sequence to infer the source port:
 
-\lipsum[14]
+\begin{enumerate}
+    \item \textbf{Probe Emission:} The attacker sends a large burst of spoofed UDP probe packets
+    targeting the victim DNS recursive resolver's port range. The source IP address of these probes
+    is spoofed to that of the target authoritative name server.
+    \item \textbf{ICMP Trigger:} The resolver's kernel generates an ICMP "Port Unreachable" error message whenever
+    a probe hits a closed port. Conversely, if the probe hits the active, open port currently used for the pending
+    DNS query, the ICMP error is suppressed.
+    \item \textbf{Rate Limit Inference:} The key exploitation mechanism is the fact that the operating system applies
+    a global rate limit to all outgoing ICMP errors. The attacker sends a final, "unspoofed" probe to a known
+    closed port on the resolver, observing the response time.
+    \begin{itemize}
+        \item If the preceding burst of spoofed probes hit enough closed ports to deplete the global ICMP quota,
+        the final legitimate probe will experience response delay or suppression.
+        \item If the burst included a hit on the active DNS source port, the corresponding ICMP error was suppressed,
+        leaving the global quota available.
+    \end{itemize}
+    \item \textbf{Source Port Derandomization:} By analyzing the timing and successful delivery of the final probe, 
+    the attacker can systematically infer which ports in the range are currently active. This process effectively
+    derandomizes the 16-bit source port.
+    \item \textbf{Cache Poisoning:} With the source port identified, the remaining entropy is reduced to the 16-bit $TxID$,
+    enabling the attacker to easily brute-force the remaining field and inject a definitive, malicious DNS response that
+    is accepted by the resolver.
+\end{enumerate}
+
+\end{document}
 
 %% ==========================================
 %% 3. TUDOOR : L'ATTAQUE LOGIQUE
