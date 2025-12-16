@@ -231,7 +231,13 @@ recursive resolver for further processing.
   \label{fig:dns}
 \end{figure}
 
-%% Faire la partie recursive resolver + authoritative server
+The \textbf{Recursive Resolver} plays an impoirtant role in the DNS resolution process. Upon receiving a query from the
+forwarder, it first checks its cache for a valid response. If the answer is not cached, the recursive resolver embarks
+on a systematic process to resolve the domain name. It begins by querying the \textbf{Root DNS Servers}, 
+which provide referrals to the appropriate \textbf{Top-Level Domain (TLD) Servers} based on the domain's 
+extension (e.g., .com, .org). The recursive resolver then queries the TLD servers, which in turn refer it to the
+\textbf{Authoritative DNS Servers} responsible for the specific domain. Finally, the authoritative server provides the 
+requested IP address, which is relayed back through the chain to the original client.
 
 \subsection{Kaminsky attack (2008)}
 
