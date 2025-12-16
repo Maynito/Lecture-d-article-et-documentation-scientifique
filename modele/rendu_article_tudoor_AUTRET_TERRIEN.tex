@@ -241,13 +241,25 @@ requested IP address, which is relayed back through the chain to the original cl
 
 \subsection{Kaminsky attack (2008)}
 
-\lipsum[7]
+In 2008, security researcher Dan Kaminsky unveiled a critical vulnerability in the DNS protocol. The core issue 
+was not just the lack of entropy in the $TxID$, but a technique that allowed an attacker to bypass 
+the Time-To-Live (TTL) mechanism that was supposed to slow down cache poisoning attempts.
 
-\lipsum[8]
+Prior to this discovery, if an attacker failed to poison a DNS cache, they would have to wait for the TTL of the 
+cached record to expire before trying again. Kaminsky's attack exploited the fact that DNS resolvers would 
+accept random queries for non-existent subdomains of a target domain (e.g., random123.target.com, random456.target.com).
+Since these subdomains do not existe in the cache, the recursive resolver is forced to query the authoritative nameserver,
+giving the attacker a infinite number of opportunities to flood the resolver with spoofed responses.
 
-\lipsum[9]
+At the time, revolvers typically used a static source port for outgoing DNS queries, which meant that the only
+field an attacker needed to guess was the 16-bit $TxID$. This provided a search space of only $2^{16}$ (65,536) possible values.
+By sending a large number of spoofed DNS responses with different $TxID$ values, the attacker could eventually
+guess the correct one and successfully poison the cache in a matter of minutes.
 
-\lipsum[10]
+Ultimately, the malicious response would be accepted by the resolver, which would then cache the incorrect mapping.
+This allowed the attacker to redirect users to malicious sites, intercept sensitive information, or launch further attacks.
+This discovery led to the implementation of \textbf{Source Port Randomization (SPR)} which increased the entropy
+to roughly 32 bits ($TxID$ + random 16-bit source port), making brute-forcing attacks significantly more difficult.
 
 \subsection{SAD DNS (2020)}
 
@@ -287,8 +299,6 @@ Prior to this attack, SPR had increased query entropy from 16 bits (Transaction 
     enabling the attacker to easily brute-force the remaining field and inject a definitive, malicious DNS response that
     is accepted by the resolver.
 \end{enumerate}
-
-\end{document}
 
 %% ==========================================
 %% 3. TUDOOR : L'ATTAQUE LOGIQUE
