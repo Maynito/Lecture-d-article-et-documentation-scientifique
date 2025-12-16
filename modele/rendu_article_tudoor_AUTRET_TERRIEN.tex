@@ -145,7 +145,7 @@
 % http://www.tug.org/applications/pdftex
 
 
-
+\usepackage{graphicx}
 
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -210,15 +210,28 @@ DNS security and propose mitigation strategies in section~\ref{sec:discussion}.
 %% ==========================================
 %% 2. ÉTAT DE L'ART & HISTORIQUE (~1 page = 1/4 du rapport)
 %% ==========================================
-\section{État de l'art et Historique}\label{sec:context}
+\section{State of the Art and Historical Overview}\label{sec:context}
 
 \subsection{How DNS Works}
 
-\lipsum[4]
+The Domain Name System (DNS) serves as a crucial component of the Internet infrastructure, that translates 
+human-readable domain names into machine-readable IP addresses. As illustrated in Figure~\ref{fig:dns}, the 
+resolution process relies on a chain of interactions between several distinct components to locate the correct resource.
 
-\lipsum[5]
+The resolution process begins when a client application, such as a web browser, needs to resolve a hostname.
+It uses the operating system's \textit{stub resolver} to initiate a request. To optimize performance and reduce the 
+latencty, this request is first sent to a pre-configured \textbf{DNS Forwarder}, often integrated into local network 
+devices like home Wi-Fi routers. If the forwarder does not have the answenr in its cache, it forwards the query to a 
+recursive resolver for further processing.
 
-\lipsum[6]
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{dns.png}
+  \caption{General DNS resolver roles and domain name resolution process.}
+  \label{fig:dns}
+\end{figure}
+
+%% Faire la partie recursive resolver + authoritative server
 
 \subsection{Kaminsky attack (2008)}
 
