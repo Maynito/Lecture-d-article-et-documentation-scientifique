@@ -146,6 +146,7 @@
 
 
 \usepackage{graphicx}
+\usepackage[center]{caption}
 
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -307,33 +308,89 @@ Prior to this attack, SPR had increased query entropy from 16 bits (Transaction 
 
 \subsection{TuDoor Attack Overview}
 
-\lipsum[15]
+The \textbf{TuDoor attack}, presented at the 2024 IEEE Symposium on Security and Privacy, represents a significant advancement in the field of DNS security vulnerabilities.
+Unlike previous attacks that primarily exploited protocol weaknesses or network side-channels (ICMP rate limiting), Tudoor targets \textbf{logic vulnerabilities} 
+in the DNS response pre-processing mechanisms of recursive resolvers.
 
-\lipsum[16]
+DNS response pre-processing is the phase where the resolver receives a packet, parses it, and validates it before exctracting the answer to cache or forward it.
+Through the analyses of 28 different DNS software implementations, researchers discovered that while the fundamental rules of DNS are simple, 
+the actual implementations are complex and often inconsistent in handling malformed packets.
 
-\lipsum[17]
-
-\subsection{Technical Details}
-
-\lipsum[18]
-
-\lipsum[19]
-
-\lipsum[20]
+The name "TuDoor" refers to a logic flaw that acts as a "hidden door" allowing attackers to inject malformed packets that should be rejected but are instead processed incorrectly,
+triggering specific state transitions. These vulnerabilities enable three types of attacks: Denial of Service (DoS), Ressource Consumption, and the most critical one
+that we will focus on in this paper, \textbf{Cache Poisoning}.
 
 \subsection{Mecanism of the Vulnerability}
 
-\lipsum[21]
+The core of the TuDoor cache poisoning attack relies on a specific logic vulnerability labeled $V_{CP}$. This vulnerability was prominently found in \textbf{Microsoft DNS},
+a widely used entreprise resolver.
 
-\lipsum[22]
+In a standard, secure implementation, when a recursive resolver opens a UDP socket to send a DNS query, it expects to receive a DNS \textit{response} packet in return.
+A valid respond must have the \textbf{QR} (Query/Response) flag set to 1, indicating that it is indeed a response. If a packet arrives with the QR flag set to 0,
+indicating it is not a response, the resolver should logically discard it.
 
-\lipsum[23]
+However, the researchers found that Microsoft DNS fails to enforce this rule correctly during the pre-processing phase.
+It allows a packet with the QR flag set to 0 to be received on the response socket, provided that the packet's "four-tuple" (source IP, source port, destination IP, destination port)
+matches an active query.
 
-\subsection{Comparative Analysis with Previous Attacks}
+Crucially, when Microsoft DNS receives this query packet on its response socket, it does not simply discard it. Instead, it treats it as a new incoming 
+question and initiates a recursive procedure to resolve the domain name contained within the malformed packet.
+This bebavior creates a deterministic \textbf{side-channel}, and if the attacker sends a DNS query to a specific port on the resolver,
+and the resolver reacts by initiating a new resolution, the attacker is aware and can confirm that the port is open and active.
 
-\lipsum[24]
+\subsection{The DNS Cache Poisoning Attack Procedure}
 
-\lipsum[25]
+Leveraging the $V_{CP}$ vulnerability, the TuDoor cache poisoning allows an off-path attacker to poison the DNS cache of a vulnerable resolver
+without relying on global ICMP rate limits or other side-channels. The attack attack proceeds in the following steps:
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{tudoor_poisoning.png}
+  \caption{Attack steps of DNSPOISONING.}
+  \label{fig:tudoor_poisoning}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Setup and Trigger:} The attacker controls a nameserver ($NS_{Atk}$) for the domain $atkr.com$. The attacker
+    initiates a DNS query to the target resolver for a victim domain (e.g., $vitm.com$).
+
+    \item \textbf{Target State:} The target resolver sends a legitimate query to the authoritative nameserver for $vitm.com$.
+    It opens a randomized source port ($Port_{RH}$) and waits for the response.
+
+    \item \textbf{Probing Phase:} The attacker sends a series of spoofed DNS query packets to the target resolver,
+    each with the QR flag set to 0. These packets are sent to different ports on the resolver, attempting to match the active source port ($Port_{RH}$).
+    These queries ask the resolver to resolve a subdomain controlled by the attacker, encoding the guessed port number in the subdomain (e.g., $guess123.atkr.com$).
+
+    \item \textbf{Hitting the Door:} When a spoofed packet hits the closed port, it is ignored. However, when the packet hits the correct active port ($Port_{RH}$),
+    the logic vulnerability $V_{CP}$ is triggered. The resolver accepts the spoofed query packet.
+
+    \item \textbf{The Oracle Signal:} Upon accepting the query $port12345.atkr.com$, the target resolver immediately sends a new DNS query
+    to the attacker's nameserver ($NS_{Atk}$) to resolve it.
+
+    \item \textbf{Port Identification:} The attacker observers the incoming query for $port12345.atkr.com$ on their own nameserver.
+    This confirms that the open port on the resolver is indeed $12345$.
+
+    \item \textbf{Cache Poisoning:} Now possessing the correct source port, the attacker only need to brute-force the 16-bit $TxID$.
+    The attacker sends a flood of spoofed DNS response packets to the resolver, each with different $TxID$ values, 
+    containing a malicious answer that redirects $vitm.com$ to a server under the attacker's control.
+
+\end{enumerate}
+
+\subsection{Comparative Analysis and Impact}
+
+The TuDoor attack represents a significant evolution in DNS cache poisoning techniques compared to previous methods like Kaminsky and SAD DNS.
+The most notable feature of TuDoor is its speed. While Sad DNS relies on ICMP rate limits that can take minutes to exploit, 
+Tudoor is highly efficient.
+
+\begin{itemize}
+    \item \textbf{Deterministic vs Probabilistic:} Sad DNS infers port based on the probability of ICMP packet supression.
+    Tudoor receives a direct, deterministic signal from the resolver when the correct port is hit.
+    \item \textbf{Execution Time:} Experimental results demonstrate that TuDoor can successfully identify the source port 
+    and poison the cache in \textbf{less than 1 second} (average 425ms for Microsoft DNS), whereas SAD DNS typically requires several minutes.
+\end{itemize}
+
+The implications of the TuDoor attack are profound. The researchers conducted internet-wide measurements and found that
+the vulnerability is widespread. If affects approximately 11.2\% of open DNS resolvers and expose them to instant cache poisoning attacks.
 
 %% ==========================================
 %% 4. DISCUSSION & CONCLUSION
