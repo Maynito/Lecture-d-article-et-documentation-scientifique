@@ -166,7 +166,7 @@
 
 \IEEEtitleabstractindextext{%
 \begin{IEEEkeywords}
-DNS Security, Logic Vulnerabilities, TuDoor Attack, Kaminsky Attack, SAD DNS, DNS Response Pre-processing
+DNS Security, Logic Vulnerabilities, TuDoor Attack, Kaminsky Attack, SADDNS, DNS Response Pre-processing
 \end{IEEEkeywords}}
 
 
@@ -193,8 +193,8 @@ communications.
 % Problématique : Complexité croissante = nouvelles failles
 Over the past two decades, DNS has been the subject of numerous cache poisoning attacks.
 The Kaminsky attack in 2008 revealed fundamental weaknesses in the protocol, leading to
-multiple patches including source port randomization. Despite these countermeasures, SAD
-DNS in 2020 demonstrated that side-channel vulnerabilities in operating systems could bypass
+multiple patches including source port randomization. Despite these countermeasures, SADDNS
+in 2020 demonstrated that side-channel vulnerabilities in operating systems could bypass
 existing protections. More recently, the TuDoor attack (2024) has unveiled a new attack surface:
 logic vulnerabilities in DNS response pre-processing, where inconsistent handling of malformed
 packets across implementations creates exploitable conditions.
@@ -203,7 +203,7 @@ packets across implementations creates exploitable conditions.
 This paper analyzes the evolution of DNS attacks and examines in detail the TuDoor attack
 methodology notably on cache poisoning. We will first present the DNS architecture in 
 section~\ref{sec:context} to get a better understanding of how it works. Then we will get an 
-overview of the history of DNS attacks with Kaminsky and SAD DNS. 
+overview of the history of DNS attacks with Kaminsky and SADDNS. 
 After that, we will describe the TuDoor attack in section~\ref{sec:contribution}, its technical
 mechanisms, and comparative analysis with prior work. Finally, we will discuss the impact on
 DNS security and propose mitigation strategies in section~\ref{sec:discussion}. 
@@ -216,7 +216,7 @@ DNS security and propose mitigation strategies in section~\ref{sec:discussion}.
 \subsection{How DNS Works}
 
 The Domain Name System (DNS) serves as a crucial component of the Internet infrastructure, that translates 
-human-readable domain names into machine-readable IP addresses. As illustrated in Figure~\ref{fig:dns}, the 
+human-readable domain names into machine-readable IP addresses. As illustrated in Figure 1, the 
 resolution process relies on a chain of interactions between several distinct components to locate the correct resource.
 
 The resolution process begins when a client application, such as a web browser, needs to resolve a hostname.
@@ -232,7 +232,7 @@ recursive resolver for further processing.
   \label{fig:dns}
 \end{figure}
 
-The \textbf{Recursive Resolver} plays an impoirtant role in the DNS resolution process. Upon receiving a query from the
+The \textbf{Recursive Resolver} plays an important role in the DNS resolution process. Upon receiving a query from the
 forwarder, it first checks its cache for a valid response. If the answer is not cached, the recursive resolver embarks
 on a systematic process to resolve the domain name. It begins by querying the \textbf{Root DNS Servers}, 
 which provide referrals to the appropriate \textbf{Top-Level Domain (TLD) Servers} based on the domain's 
@@ -249,10 +249,10 @@ the Time-To-Live (TTL) mechanism that was supposed to slow down cache poisoning 
 Prior to this discovery, if an attacker failed to poison a DNS cache, they would have to wait for the TTL of the 
 cached record to expire before trying again. Kaminsky's attack exploited the fact that DNS resolvers would 
 accept random queries for non-existent subdomains of a target domain (e.g., random123.target.com, random456.target.com).
-Since these subdomains do not existe in the cache, the recursive resolver is forced to query the authoritative nameserver,
-giving the attacker a infinite number of opportunities to flood the resolver with spoofed responses.
+Since these subdomains do not exist in the cache, the recursive resolver is forced to query the authoritative nameserver,
+giving the attacker an infinite number of opportunities to flood the resolver with spoofed responses.
 
-At the time, revolvers typically used a static source port for outgoing DNS queries, which meant that the only
+At the time, resolvers typically used a static source port for outgoing DNS queries, which meant that the only
 field an attacker needed to guess was the 16-bit $TxID$. This provided a search space of only $2^{16}$ (65,536) possible values.
 By sending a large number of spoofed DNS responses with different $TxID$ values, the attacker could eventually
 guess the correct one and successfully poison the cache in a matter of minutes.
@@ -262,20 +262,19 @@ This allowed the attacker to redirect users to malicious sites, intercept sensit
 This discovery led to the implementation of \textbf{Source Port Randomization (SPR)} which increased the entropy
 to roughly 32 bits ($TxID$ + random 16-bit source port), making brute-forcing attacks significantly more difficult.
 
-\subsection{SAD DNS (2020)}
+\subsection{SADDNS (2020)}
 
-The \textbf{SAD DNS (Side-channel AttackeD DNS) attack}, disclosed in 2020 by researchers from Tsinghua University
+The \textbf{SADDNS (Side-channel AttackeD DNS) attack}, disclosed in 2020 by researchers from Tsinghua University
 and the University of California, Riverside, marked a critical regression in DNS security. It demonstrated a method
 to effectively resurrect the classic DNS cache poisoning attack by bypassing the primary mitigation implemented
 after the 2008 Kaminsky attack: \textbf{Source Port Randomization (SPR)}.
 
-The success of SAD DNS relies on exploiting a subtle, yet pervasive, vulnerability in the networking stacks of modern
+The success of SADDNS relies on exploiting a subtle, yet pervasive, vulnerability in the networking stacks of modern
 operating systems: the predictable rate limit applied to outgoing \textbf{Internet Control Message Protocol (ICMP)}
 error messages, specifically the "Port Unreachable" message. This ICMP rate limit serves as a timing side-channel that
 allows an off-path attacker to significantly reduce the entropy of a DNS query.
 
-Prior to this attack, SPR had increased query entropy from 16 bits (Transaction ID, $TxID$) to 32 bits
-($TxID$ plus the random 16-bit source port). The attack uses the following sequence to infer the source port:
+The attack uses the following sequence to infer the source port:
 
 \begin{enumerate}
     \item \textbf{Probe Emission:} The attacker sends a large burst of spoofed UDP probe packets
@@ -300,6 +299,12 @@ Prior to this attack, SPR had increased query entropy from 16 bits (Transaction 
     enabling the attacker to easily brute-force the remaining field and inject a definitive, malicious DNS response that
     is accepted by the resolver.
 \end{enumerate}
+To mitigate the SADDNS (Side-channel Attack on DNS) threat, security measures primarily focus on disrupting the ICMP-based side channel.
+The core defense involves implementing randomized ICMP rate limiting within the network stack (notably in the Linux kernel),
+which introduces statistical noise into the "Port Unreachable" response patterns. This process prevents attackers from reliably probing the state of UDP ports
+on the resolver, preserving the effectiveness of Source Port Randomization (SPR) as a defense against DNS cache poisoning attacks.
+Furthermore, the adoption of DNSSEC provides a structural defense by mandating cryptographic authentication of DNS records.
+By doing so, any forged response is rejected for lack of a valid digital signature, regardless of whether the attacker successfully identifies the transaction parameters.
 
 %% ==========================================
 %% 3. TUDOOR : L'ATTAQUE LOGIQUE
@@ -333,10 +338,10 @@ However, the researchers found that Microsoft DNS fails to enforce this rule cor
 It allows a packet with the QR flag set to 0 to be received on the response socket, provided that the packet's "four-tuple" (source IP, source port, destination IP, destination port)
 matches an active query.
 
-Crucially, when Microsoft DNS receives this query packet on its response socket, it does not simply discard it. Instead, it treats it as a new incoming 
+Crucially, when Microsoft DNS receives this query packet on its response socket, it does not simply discard it. Instead, it treats it as a new incoming
 question and initiates a recursive procedure to resolve the domain name contained within the malformed packet.
-This bebavior creates a deterministic \textbf{side-channel}, and if the attacker sends a DNS query to a specific port on the resolver,
-and the resolver reacts by initiating a new resolution, the attacker is aware and can confirm that the port is open and active.
+This behavior creates a deterministic \textbf{side-channel}: when an attacker sends a DNS query to a specific resolver port, the resolver initiates a new
+resolution, thereby signaling to the attacker that the port is open and active.
 
 \subsection{The DNS Cache Poisoning Attack Procedure}
 
@@ -378,19 +383,26 @@ without relying on global ICMP rate limits or other side-channels. The attack at
 
 \subsection{Comparative Analysis and Impact}
 
-The TuDoor attack represents a significant evolution in DNS cache poisoning techniques compared to previous methods like Kaminsky and SAD DNS.
-The most notable feature of TuDoor is its speed. While Sad DNS relies on ICMP rate limits that can take minutes to exploit, 
+The TuDoor attack represents a significant evolution in DNS cache poisoning techniques compared to previous methods like Kaminsky and SADDNS.
+The most notable feature of TuDoor is its speed. While SADDNS relies on ICMP rate limits that can take minutes to exploit, 
 Tudoor is highly efficient.
 
 \begin{itemize}
-    \item \textbf{Deterministic vs Probabilistic:} Sad DNS infers port based on the probability of ICMP packet supression.
+    \item \textbf{Deterministic vs Probabilistic:} SADDNS infers port based on the probability of ICMP packet supression.
     Tudoor receives a direct, deterministic signal from the resolver when the correct port is hit.
     \item \textbf{Execution Time:} Experimental results demonstrate that TuDoor can successfully identify the source port 
-    and poison the cache in \textbf{less than 1 second} (average 425ms for Microsoft DNS), whereas SAD DNS typically requires several minutes.
+    and poison the cache in \textbf{less than 1 second} (average 425ms for Microsoft DNS), whereas SADDNS typically requires several minutes.
 \end{itemize}
 
 The implications of the TuDoor attack are profound. The researchers conducted internet-wide measurements and found that
-the vulnerability is widespread. If affects approximately 11.2\% of open DNS resolvers and expose them to instant cache poisoning attacks.
+the vulnerability is widespread. The cache poisoning vulnerability affects approximately 11.2\% of open DNS resolvers and expose them to instant cache poisoning attacks.
+Overall, the different TuDoor attacks affects 23.1\% of the open DNS resolvers on the Internet, highlighting a significant security risk.
+The primary defense involves deploying vendor-specific patches-addressing over 30 identified Common Vulnerabilities and Exposures that enforce strict validation of DNS headers
+before any state is allocated for response processing. Furthermore, resolvers have been updated to implement stricter IPID randomization and more robust reassembly logic
+to prevent off-path attackers from injecting malicious fragments. By disabling the processing of additional records in truncated responses and mandating a fallback to TCP
+for large payloads, systems effectively close the "logic doors" exploited by the attack. Finally, as with previous cache poisoning threats,
+the systematic implementation of DNSSEC provides a definitive layer of protection, as the cryptographic verification of records ensures 
+that any successfully injected but forged data is discarded during the validation phase.
 
 %% ==========================================
 %% 4. DISCUSSION & CONCLUSION
@@ -418,7 +430,7 @@ X.~Li \emph{et al.}, ``TuDoor Attack: Systematically Exploring and Exploiting Lo
 D.~Kaminsky, ``DNS Vulnerability,'' Black Hat USA, 2008.
 
 \bibitem{saddns}
-K.~Qian \emph{et al.}, ``SAD DNS: Exploiting Weakened Trust in DNS,'' \emph{ACM CCS}, 2020.
+K.~Qian \emph{et al.}, ``SADDNS: Exploiting Weakened Trust in DNS,'' \emph{ACM CCS}, 2020.
 
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
