@@ -411,16 +411,33 @@ that any successfully injected but forged data is discarded during the validatio
 
 \subsection{Impact on DNS Security}
 
-\lipsum[26]
+The TuDoor attack reveals a fundamental issue in DNS security: the gap between protocol specifications and their implementations.
+In our opinion, this research is particularly valuable because it shifts the focus from protocol-level vulnerabilities to implementation-level logic flaws.
+While previous attacks like Kaminsky and SADDNS exploited weaknesses in the DNS protocol itself or in operating system behaviors,
+TuDoor demonstrates that even well-patched systems can harbor dangerous vulnerabilities in their parsing and pre-processing logic.
 
-\subsection{Causes and Mitigations}
+The widespread impact of TuDoor, affecting over 23\% of open DNS resolvers, underscores the urgent need for comprehensive security audits across all DNS implementations.
+The fact that Microsoft DNS, a widely deployed enterprise solution, was vulnerable to such a fundamental logic flaw raises concerns about the security posture of other proprietary and open-source DNS software.
+Moreover, the speed of the attack (less than 1 second) represents a critical escalation in the threat landscape, as it provides attackers with a near-instantaneous poisoning capability that can bypass many 
+monitoring and detection systems designed to catch slower, more traditional attacks.
 
-\lipsum[27]
+The TuDoor research also highlights the importance of defensive programming practices in critical infrastructure software.
+The vulnerability stems from insufficient validation during the pre-processing phase, specifically the failure to properly enforce the QR flag check before allocating resources or triggering state transitions.
+This suggests that many DNS implementations may benefit from adopting a more rigorous validation framework, where all packet fields are verified against RFC specifications before any processing occurs.
+Additionally, the deployment of DNSSEC, while providing strong cryptographic guarantees, remains limited in practice, leaving many domains vulnerable to cache poisoning attacks regardless of the resolver's security posture.
 
 \subsection{Conclusion}
 
-\lipsum[28]
+The evolution of DNS security threats from Kaminsky through SADDNS to TuDoor illustrates a continuous arms race between attackers and defenders. 
+While previous attacks targeted protocol weaknesses and system-level side channels, TuDoor's focus on implementation logic flaws opens a new chapter in DNS security research.
 
+The key lesson from TuDoor is that secure protocol design alone is insufficient. Even with proper countermeasures like Source Port Randomization in place, 
+inconsistent implementation of basic validation rules can undermine the entire security model. This emphasizes the need for thorough testing and verification of DNS software, particularly in how they handle edge cases and malformed packets.
+
+Looking ahead, the DNS ecosystem must adopt a multi-layered defense strategy. Vendors should implement comprehensive validation frameworks during packet pre-processing, 
+ensuring strict compliance with protocol specifications before any state allocation. The continued expansion of DNSSEC adoption remains essential, as cryptographic 
+validation provides the only definitive protection against cache poisoning, regardless of the attack vector employed. The development of automated testing tools capable of detecting logic vulnerabilities across 
+different DNS implementations would help identify these issues earlier in the development cycle.
 
 \begin{thebibliography}{1}
 \bibitem{tudoor}
