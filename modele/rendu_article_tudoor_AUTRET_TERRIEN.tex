@@ -242,6 +242,14 @@ requested IP address, which is relayed back through the chain to the original cl
 
 \subsection{Kaminsky attack (2008)}
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{kaminsky.png}
+  \caption{Kaminsky attack overview.}
+  \label{fig:kaminsky}
+\end{figure}
+
+
 In 2008, security researcher Dan Kaminsky unveiled a critical vulnerability in the DNS protocol. The core issue 
 was not just the lack of entropy in the $TxID$, but a technique that allowed an attacker to bypass 
 the Time-To-Live (TTL) mechanism that was supposed to slow down cache poisoning attempts.
@@ -448,6 +456,9 @@ D.~Kaminsky, ``DNS Vulnerability,'' Black Hat USA, 2008.
 
 \bibitem{saddns}
 K.~Qian \emph{et al.}, ``SADDNS: Exploiting Weakened Trust in DNS,'' \emph{ACM CCS}, 2020.
+
+\bibitem{cloudflare}
+M.~Vavruša and N.~Sullivan, "SAD DNS Explained," Cloudflare Blog, Nov. 13, 2020. Available: https://blog.cloudflare.com/sad-dns-explained/
 
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
